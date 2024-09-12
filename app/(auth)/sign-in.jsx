@@ -1,11 +1,12 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Alert } from "react-native";
 import { React, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "../../constants";
 import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { signIn } from "../../lib/appwrite";
 
 const SignIn = () => {
   const [form, setForm] = useState({
@@ -15,13 +16,29 @@ const SignIn = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submit = () => {};
+  const submit = async () => {
+    if (!form.email || !form.password) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos");
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await signIn(form.email, form.password, form.username);
+      // setar como estado global
+      router.replace("/home");
+    } catch (error) {
+      Alert.alert("Erro", error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
         <View className="w-full justify-center items-center px-4">
-          <Text className="text-4xl font-pblack text-[#EBD9B4] pt-5">
+          <Text className="text-4xl font-pblack text-[#EBD9B4] pt-[80px]">
             Biblioteca
           </Text>
           <Text className="text-2xl font-pblack text-[#EBD9B4] my-[-8px]">
